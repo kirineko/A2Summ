@@ -14,14 +14,23 @@ The official repository of our paper "**Align and Attend: Multimodal Summarizati
 
 
 ## Requirements
-You can install the conda environment by running:
+This project now uses `uv` to manage dependencies.
+
 ```bash
-conda create -n a2summ python=3.8.13
-conda activate a2summ
-pip install torch==1.12.0+cu113 torchvision==0.13.0+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-pip install tensorboard
-pip install rouge-score==0.1.2
-pip install scipy ortools h5py pyyaml
+uv python install 3.10.20
+uv sync
+uv run python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab')"
+```
+
+Notes:
+- `torch` and `torchvision` are pinned to the Tsinghua PyPI mirror through `pyproject.toml`.
+- To use the CUDA 13 line from the Tsinghua mirror, the project targets Python 3.10 and installs `torch==2.11.0` with `torchvision==0.26.0`.
+- These PyPI wheels resolve to CUDA 13 runtime dependencies such as `nvidia-cudnn-cu13` through `uv sync`.
+- `nltk` resources `punkt` and `punkt_tab` are required for ROUGE evaluation during training and validation.
+
+If you prefer a one-off sync with an existing interpreter, you can also run:
+```bash
+uv sync --python 3.10.20
 ```
 
 ## Dataset
@@ -60,14 +69,14 @@ For the BLiSS dataset, due to the copyright issue, we only provide the extracted
 ### Training
 We train the model on a single GTX-1080ti GPU. To train the model on different dataset, please execute the following command.
 ```bash
-python train.py --dataset ${dataset}
+uv run python train.py --dataset ${dataset}
 ```
 
 ### Testing
 First, download the [checkpoints](https://drive.google.com/file/d/1LuXWjW3BcAXCOals4o2UUVYMx-FYnJ3T/view?usp=sharing) into "saved_model" directory and pass it as the checkpoint flag. 
 
 ```bash
-python train.py --dataset ${dataset} \
+uv run python train.py --dataset ${dataset} \
     --test --checkpoint saved_model/${dataset}
 ```
 
@@ -88,4 +97,3 @@ If you find our code or our paper useful for your research, please **[★star]**
 We referenced the repos below for the code
 - [DSNet](https://github.com/li-plus/DSNet)
 - [UMT](https://github.com/TencentARC/UMT)
-

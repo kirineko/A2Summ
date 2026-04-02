@@ -1,7 +1,22 @@
 from typing import Iterable, List
 
 import numpy as np
-from ortools.algorithms.pywrapknapsack_solver import KnapsackSolver
+try:
+    from ortools.algorithms.pywrapknapsack_solver import KnapsackSolver
+    _KNAPSACK_SOLVER_TYPE = KnapsackSolver.KNAPSACK_DYNAMIC_PROGRAMMING_SOLVER
+    _KNAPSACK_INIT = "Init"
+    _KNAPSACK_SOLVE = "Solve"
+    _KNAPSACK_CONTAINS = "BestSolutionContains"
+except ModuleNotFoundError:
+    from ortools.algorithms.python.knapsack_solver import (
+        KNAPSACK_DYNAMIC_PROGRAMMING_SOLVER,
+        KnapsackSolver,
+    )
+
+    _KNAPSACK_SOLVER_TYPE = KNAPSACK_DYNAMIC_PROGRAMMING_SOLVER
+    _KNAPSACK_INIT = "init"
+    _KNAPSACK_SOLVE = "solve"
+    _KNAPSACK_CONTAINS = "best_solution_contains"
 
 import pdb
 
@@ -36,17 +51,17 @@ def knapsack(values: Iterable[int],
     :return: List of packed item indices.
     """
     knapsack_solver = KnapsackSolver(
-        KnapsackSolver.KNAPSACK_DYNAMIC_PROGRAMMING_SOLVER, 'test'
+        _KNAPSACK_SOLVER_TYPE, 'test'
     )
 
     values = list(values)
     weights = list(weights)
     capacity = int(capacity)
 
-    knapsack_solver.Init(values, [weights], [capacity])
-    knapsack_solver.Solve()
+    getattr(knapsack_solver, _KNAPSACK_INIT)(values, [weights], [capacity])
+    getattr(knapsack_solver, _KNAPSACK_SOLVE)()
     packed_items = [x for x in range(0, len(weights))
-                    if knapsack_solver.BestSolutionContains(x)]
+                    if getattr(knapsack_solver, _KNAPSACK_CONTAINS)(x)]
 
     return packed_items
 

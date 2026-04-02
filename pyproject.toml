@@ -1,0 +1,26 @@
+[project]
+name = "a2summ"
+version = "0.1.0"
+description = "Align and Attend: Multimodal Summarization with Dual Contrastive Losses"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "h5py",
+    "numpy",
+    "ortools",
+    "pyyaml",
+    "rouge-score==0.1.2",
+    "scipy",
+    "tensorboard",
+    "torch==2.11.0",
+    "torchvision==0.26.0",
+    "tqdm",
+]
+
+[tool.uv.sources]
+torch = { index = "tsinghua" }
+torchvision = { index = "tsinghua" }
+
+[[tool.uv.index]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+explicit = true
