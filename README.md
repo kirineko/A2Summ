@@ -80,6 +80,39 @@ uv run python train.py --dataset ${dataset} \
     --test --checkpoint saved_model/${dataset}
 ```
 
+### Raw Video Inference
+The repository can also run a lightweight end-to-end inference path for `SumMe` / `TVSum` style checkpoints:
+
+1. Sample frames from a raw video with `ffmpeg`
+2. Extract GoogleNet pool5-style frame features
+3. Run Whisper ASR to get timestamped speech segments
+4. Build a DSNet/VASNet-like `.h5` file plus ASR-backed text features and alignment masks
+4. Reuse the current `Model_VideoSumm` checkpoints to export summary JSON
+
+Preprocess only:
+```bash
+uv run python preprocess_video_to_h5.py \
+    --video /path/to/input.mp4 \
+    --output-dir /path/to/artifacts \
+    --asr-model openai/whisper-base
+```
+
+End-to-end inference:
+```bash
+uv run python infer_video_summary.py \
+    --video /path/to/input.mp4 \
+    --dataset SumMe \
+    --checkpoint-dir saved_model/SumMe \
+    --work-dir logs/raw_video_infer \
+    --output-json logs/raw_video_infer/result.json \
+    --asr-model openai/whisper-base
+```
+
+Notes:
+- This path is format-compatible with the existing `SumMe` / `TVSum` pipeline, but it is only an approximation of the original dataset preprocessing.
+- The script now uses Whisper ASR segments to build text features and cross-modal alignment, which is closer to the original multimodal setting than the previous proxy-text fallback.
+- Generated artifacts include `*.h5`, `*_text_roberta.npy`, `*_alignment.npz`, `*_asr.json`, `*_metadata.json`, screenshots, and the final summary JSON.
+
 
 ## Citation
 If you find our code or our paper useful for your research, please **[★star]** this repo and **[cite]** the following paper:
